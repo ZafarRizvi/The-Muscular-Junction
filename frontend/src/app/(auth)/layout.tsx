@@ -23,11 +23,11 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
               A Modern Physiotherapy Clinic.
             </p>
             <div className="flex items-center justify-center">
-              <img
+              {/* <img
                 src="/auth-illustration.svg"
                 alt="Clinic Illustration"
                 className="max-h-64 object-contain drop-shadow-lg"
-              />
+              /> */}
             </div>
           </div>
         </div>

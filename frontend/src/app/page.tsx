@@ -2,9 +2,8 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import ThemeToggle from "@/components/ThemeToggle";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
 
   const goToLogin = () => {
@@ -24,4 +23,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
