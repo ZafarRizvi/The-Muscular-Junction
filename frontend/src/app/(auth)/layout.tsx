@@ -14,20 +14,20 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         </div>
 
         {/* Right Section (Branding / Illustration) */}
-        <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-emerald-400 to-emerald-600 text-white p-12">
+        <div className="hidden lg:flex flex-1 items-center justify-center bg-white text-black p-12">
           <div className="text-center max-w-md space-y-6">
-            <h1 className="text-4xl font-extrabold">
+            {/* <h1 className="text-4xl font-extrabold">
               Welcome to The Muscular Junction
             </h1>
             <p className="text-lg leading-relaxed opacity-90">
               A Modern Physiotherapy Clinic.
-            </p>
+            </p> */}
             <div className="flex items-center justify-center">
-              {/* <img
-                src="/auth-illustration.svg"
+              <img
+                src="imgs/auth-illustration.png"
                 alt="Clinic Illustration"
-                className="max-h-64 object-contain drop-shadow-lg"
-              /> */}
+                className="object-contain drop-shadow-lg"
+              />
             </div>
           </div>
         </div>
