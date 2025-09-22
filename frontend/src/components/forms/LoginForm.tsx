@@ -120,12 +120,12 @@ export default function LoginForm() {
       </form>
 
       {/* Signup */}
-      <p className="mt-6 text-sm text-center text-gray-600">
+      {/* <p className="mt-6 text-sm text-center text-gray-600">
         Don’t have an account?{" "}
         <a href="/signup" className="font-medium text-blue-600 hover:underline">
           Sign Up
         </a>
-      </p>
+      </p> */}
     </div>
   );
 }
