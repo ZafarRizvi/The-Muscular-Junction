@@ -60,7 +60,7 @@ The system streamlines clinic operations with dedicated panels for each role:
 
 ## 📊 Database Design
 
-![Clinic ERD](./frontend/public/imgs/DB_ERD.png)
+![Clinic ERD](./README_imgs/DB_ERD.png)
 
 ---
 
@@ -76,9 +76,9 @@ The system streamlines clinic operations with dedicated panels for each role:
 
 ## 🎨 Mockups
 
-| Login (Patient)                                                              | Login (Admin)                                                            |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Patient Login](https://via.placeholder.com/300x200.png?text=Patient+Login) | ![Admin Login](https://via.placeholder.com/300x200.png?text=Admin+Login) |
+| Login (Patient)                                  | Login (Admin)                                  |
+| ------------------------------------------------ | ---------------------------------------------- |
+| ![Patient Login](./README_imgs/login_mockup.png) | ![Admin Login](./README_imgs/login_mockup.png) |
 
 | Admin Dashboard                                                                  | Receptionist Dashboard                                                                         |
 | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
