@@ -60,7 +60,7 @@ The system streamlines clinic operations with dedicated panels for each role:
 
 ## 📊 Database Design
 
-![Clinic ERD](./docs/clinic_erd.png)
+![Clinic ERD](./frontend/public/imgs/DB_ERD.png)
 
 ---
 
