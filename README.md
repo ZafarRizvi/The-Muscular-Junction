@@ -1,4 +1,4 @@
-# ![Logo TMJ](./frontend/public/imgs/tmj-logo.png) The Muscular Junction – Clinic Management System (MVP)
+# <img src="./frontend/public/imgs/tmj-logo.png" width="100" height="100" /> The Muscular Junction – Clinic Management System (MVP)
 
 A **role-based clinic management system** built for a **Physiotherapy Clinic**.  
 This **MVP (Minimum Viable Product)** is designed for **simplicity, speed, and clean workflows** — with a **scalable architecture** for future growth.
