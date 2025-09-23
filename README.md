@@ -112,6 +112,7 @@ npx prisma migrate dev
 
 # Start development server
 npm run dev
+```
 
 ## 🧭 Roadmap
 
@@ -136,12 +137,4 @@ For major changes, please open an issue first to discuss the feature or fix.
 
 Licensed under the **MIT License**.
 
----
-
-👉 This format is **optimized for GitHub**:
-- Uses collapsible `<details>` sections for role-based features
-- Clean tables for mockups/screenshots
-- Proper markdown hierarchy
-- Works well with GitHub’s dark/light mode
-
-```
+Developed with 🤝 by ZafarRizvi @AlgoBee_Solutions
