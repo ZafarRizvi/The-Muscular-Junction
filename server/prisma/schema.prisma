@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  prefix String @db.Char(1)
+  users  User[]
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  publicId     String        @unique
+  name         String
+  email        String?       @unique
+  passwordHash String
+  gender       String?
+  contact      String?
+  address      String?
+  roleId       Int
+  role         Role          @relation(fields: [roleId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  isDeleted    Boolean       @default(false)
+  doctor       Doctor?
+  receptionist Receptionist?
+  patient      Patient?
+  salaries     Salary[]
+}
+
+model Doctor {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique
+  user         User      @relation(fields: [userId], references: [id])
+  degree       String
+  designation  String
+  workingStart DateTime
+  workingEnd   DateTime
+  sessions     Session[]
+}
+
+model Receptionist {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Patient {
+  id       Int       @id @default(autoincrement())
+  userId   Int       @unique
+  user     User      @relation(fields: [userId], references: [id])
+  cnic     String?
+  dob      DateTime
+  sessions Session[]
+}
+
+model Session {
+  id           Int           @id @default(autoincrement())
+  doctorId     Int
+  patientId    Int
+  date         DateTime
+  reason       String?
+  doctor       Doctor        @relation(fields: [doctorId], references: [id])
+  patient      Patient       @relation(fields: [patientId], references: [id])
+  prescription Prescription?
+  isDeleted    Boolean       @default(false)
+}
+
+model Prescription {
+  id                Int     @id @default(autoincrement())
+  sessionId         Int     @unique
+  notes             String?
+  reasonIdentified  String?
+  procedureFollowed String?
+  session           Session @relation(fields: [sessionId], references: [id])
+  isDeleted         Boolean @default(false)
+}
+
+model Salary {
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  amount   Float
+  paidTill DateTime? @default(now())
+  user     User      @relation(fields: [userId], references: [id])
+}
