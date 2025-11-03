@@ -60,9 +60,7 @@ const LoginForm = () => {
       if (res.status === 200) {
         setLoginStatus("success");
         await mutate("/admin/me"); // revalidate cache so Navbar sees new state
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 800);
+        router.push("/dashboard");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {

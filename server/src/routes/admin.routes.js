@@ -9,6 +9,7 @@ import authAdminMiddleware from "../middlewares/authAdmin.middleware.js";
 import {
   addDoctor,
   getAllDoctors,
+  getDoctorByPublicId,
   getDoctorCount,
 } from "../controllers/doctor.controllers.js";
 import {
@@ -29,6 +30,7 @@ router.post(
   addDoctor
 );
 router.get("/doctors/count", authAdminMiddleware, getDoctorCount);
+router.get("/doctor/:publicId", authAdminMiddleware, getDoctorByPublicId);
 router.get("/doctors", authAdminMiddleware, getAllDoctors);
 
 export default router;

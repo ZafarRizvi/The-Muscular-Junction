@@ -129,6 +129,81 @@ export const addDoctor = async (req, res) => {
 };
 
 /**
+ * @route   GET /api/admin/doctors/:publicId
+ * @desc    Get full doctor details by publicId (Admin only)
+ * @access  Private
+ * @returns Status code, Success/Error Message, Full Doctor object (on success)
+ */
+export const getDoctorByPublicId = async (req, res) => {
+  try {
+    const { publicId } = req.params;
+
+    // 1️⃣ Find doctor (with full nested details)
+    const doctorData = await prisma.user.findUnique({
+      where: { publicId },
+      include: {
+        role: true,
+        salaries: true, // ✅ salary belongs to User, not Doctor
+        doctor: {
+          include: {
+            sessions: true, // ✅ sessions belong to Doctor
+          },
+        },
+      },
+    });
+
+    // 2️⃣ Check if doctor exists and has the correct role
+    if (!doctorData || doctorData.role.name !== "Doctor") {
+      return res.status(404).json({
+        message: "Doctor not found.",
+      });
+    }
+
+    // 3️⃣ Combine all details (unfiltered for admin)
+    const fullDoctor = {
+      id: doctorData.id,
+      publicId: doctorData.publicId,
+      name: doctorData.name,
+      email: doctorData.email,
+      gender: doctorData.gender,
+      contact: doctorData.contact,
+      address: doctorData.address,
+      isDeleted: doctorData.isDeleted,
+      createdAt: doctorData.createdAt,
+      updatedAt: doctorData.updatedAt,
+      role: {
+        id: doctorData.role.id,
+        name: doctorData.role.name,
+        prefix: doctorData.role.prefix,
+      },
+      doctorDetails: doctorData.doctor
+        ? {
+            id: doctorData.doctor.id,
+            degree: doctorData.doctor.degree,
+            designation: doctorData.doctor.designation,
+            workingStart: doctorData.doctor.workingStart,
+            workingEnd: doctorData.doctor.workingEnd,
+          }
+        : null,
+      salaries: doctorData.salaries?.map((s) => ({
+        id: s.id,
+        amount: s.amount,
+        paidTill: s.paidTill,
+      })),
+    };
+
+    // 4️⃣ Send response
+    return res.status(200).json({ doctor: fullDoctor });
+  } catch (err) {
+    console.error("❌ Error in getDoctorByPublicId:", err);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+/**
  * @route   GET /api/admin/doctors/count
  * @desc    Get total number of doctors in the system
  * @access  Private (Admin only)

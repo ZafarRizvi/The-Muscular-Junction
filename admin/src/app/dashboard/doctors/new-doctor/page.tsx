@@ -90,7 +90,6 @@ export default function NewDoctorPage() {
         setStatus("success");
         form.reset();
         console.log("✅ Doctor added successfully!");
-        // Optional: redirect or toast message
         setTimeout(() => {
           router.push("/dashboard/doctors");
         }, 1000);
