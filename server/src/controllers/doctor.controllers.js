@@ -367,3 +367,155 @@ export const getAllDoctors = async (req, res) => {
     });
   }
 };
+
+/**
+ * @route   PUT /api/admin/edit-doctor/:publicId
+ * @desc    Update existing doctor (Admin only)
+ * @access  Private
+ * @expects Body: {
+ *  fullName, email, gender, contact, address,
+ *  latestDegree, designation, salary, startTime, endTime, password?
+ * }
+ */
+export const editDoctorByPublicId = async (req, res) => {
+  try {
+    const { publicId } = req.params;
+    const {
+      fullName,
+      email,
+      gender,
+      contact,
+      address,
+      latestDegree,
+      designation,
+      salary,
+      startTime,
+      endTime,
+      password, // optional
+    } = req.body;
+
+    // 1️⃣ Fetch doctor with relations
+    const doctorData = await prisma.user.findUnique({
+      where: { publicId },
+      include: {
+        role: true,
+        doctor: true,
+        salaries: {
+          orderBy: { id: "desc" }, // ✅ FIXED: order by id instead of createdAt
+          take: 1,
+        },
+      },
+    });
+
+    if (!doctorData || doctorData.role.name !== "Doctor") {
+      return res.status(404).json({ message: "Doctor not found." });
+    }
+
+    // 2️⃣ Prepare update objects
+    const userUpdates = {};
+    const doctorUpdates = {};
+    let salaryUpdateNeeded = false;
+    let newSalaryValue = null;
+
+    // --- User fields ---
+    if (fullName && fullName !== doctorData.name) userUpdates.name = fullName;
+    if (email && email !== doctorData.email) userUpdates.email = email;
+    if (gender && gender !== doctorData.gender) userUpdates.gender = gender;
+    if (contact && contact !== doctorData.contact)
+      userUpdates.contact = contact;
+    if (address && address !== doctorData.address)
+      userUpdates.address = address;
+
+    // --- Doctor fields ---
+    if (latestDegree && latestDegree !== doctorData.doctor?.degree)
+      doctorUpdates.degree = latestDegree;
+    if (designation && designation !== doctorData.doctor?.designation)
+      doctorUpdates.designation = designation;
+
+    const newStart = timeStringToDate(startTime);
+    const newEnd = timeStringToDate(endTime);
+
+    if (
+      newStart.toISOString() !==
+        doctorData.doctor?.workingStart?.toISOString() ||
+      newEnd.toISOString() !== doctorData.doctor?.workingEnd?.toISOString()
+    ) {
+      doctorUpdates.workingStart = newStart;
+      doctorUpdates.workingEnd = newEnd;
+    }
+
+    // --- Password ---
+    if (password && password.trim() !== "") {
+      const isSame = await bcrypt.compare(password, doctorData.passwordHash);
+      if (!isSame) {
+        userUpdates.passwordHash = await bcrypt.hash(password, 10);
+      }
+    }
+
+    // --- Salary ---
+    const currentSalary = doctorData.salaries?.[0]?.amount || 0;
+    if (parseFloat(salary) !== currentSalary) {
+      salaryUpdateNeeded = true;
+      newSalaryValue = parseFloat(salary);
+    }
+
+    // 3️⃣ If no changes
+    if (
+      Object.keys(userUpdates).length === 0 &&
+      Object.keys(doctorUpdates).length === 0 &&
+      !salaryUpdateNeeded
+    ) {
+      return res.status(200).json({ message: "No changes detected." });
+    }
+
+    // 4️⃣ Transaction update
+    const updatedDoctor = await prisma.$transaction(async (tx) => {
+      let updatedUser = null;
+      let updatedDoctorData = null;
+      let updatedSalary = null;
+
+      if (Object.keys(userUpdates).length > 0) {
+        updatedUser = await tx.user.update({
+          where: { id: doctorData.id },
+          data: userUpdates,
+        });
+      }
+
+      if (Object.keys(doctorUpdates).length > 0) {
+        updatedDoctorData = await tx.doctor.update({
+          where: { id: doctorData.doctor.id },
+          data: doctorUpdates,
+        });
+      }
+
+      if (salaryUpdateNeeded) {
+        updatedSalary = await tx.salary.create({
+          data: {
+            userId: doctorData.id,
+            amount: newSalaryValue,
+          },
+        });
+      }
+
+      return { updatedUser, updatedDoctorData, updatedSalary };
+    });
+
+    // 5️⃣ Send response
+    return res.status(200).json({
+      message: "Doctor updated successfully.",
+      updates: {
+        ...(updatedDoctor.updatedUser && { user: userUpdates }),
+        ...(updatedDoctor.updatedDoctorData && { doctor: doctorUpdates }),
+        ...(updatedDoctor.updatedSalary && {
+          salary: updatedDoctor.updatedSalary.amount,
+        }),
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error in editDoctorByPublicId:", error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};

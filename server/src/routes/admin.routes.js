@@ -8,6 +8,7 @@ import { validationMiddleware } from "../middlewares/validation.middleware.js";
 import authAdminMiddleware from "../middlewares/authAdmin.middleware.js";
 import {
   addDoctor,
+  editDoctorByPublicId,
   getAllDoctors,
   getDoctorByPublicId,
   getDoctorCount,
@@ -32,5 +33,6 @@ router.post(
 router.get("/doctors/count", authAdminMiddleware, getDoctorCount);
 router.get("/doctor/:publicId", authAdminMiddleware, getDoctorByPublicId);
 router.get("/doctors", authAdminMiddleware, getAllDoctors);
+router.put("/edit-doctor/:publicId", authAdminMiddleware, editDoctorByPublicId);
 
 export default router;
