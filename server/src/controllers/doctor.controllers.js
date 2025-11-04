@@ -519,3 +519,44 @@ export const editDoctorByPublicId = async (req, res) => {
     });
   }
 };
+
+export const deleteDoctorByPublicId = async (req, res) => {
+  const { publicId } = req.params;
+  console.log("🧾 Delete Doctor request for:", publicId);
+
+  try {
+    // ✅ 1. Find the doctor by publicId
+    const doctorUser = await prisma.user.findUnique({
+      where: { publicId },
+      include: { doctor: true },
+    });
+
+    if (!doctorUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    // ✅ 2. Soft delete the user (set isDeleted = true)
+    const updatedUser = await prisma.user.update({
+      where: { publicId },
+      data: { isDeleted: true },
+    });
+
+    console.log("✅ Doctor marked as deleted:", publicId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Doctor deleted successfully (soft delete applied)",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("❌ Error in deleteDoctorByPublicId:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error while deleting doctor",
+      error: error.message,
+    });
+  }
+};

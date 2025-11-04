@@ -8,6 +8,7 @@ import { validationMiddleware } from "../middlewares/validation.middleware.js";
 import authAdminMiddleware from "../middlewares/authAdmin.middleware.js";
 import {
   addDoctor,
+  deleteDoctorByPublicId,
   editDoctorByPublicId,
   getAllDoctors,
   getDoctorByPublicId,
@@ -34,5 +35,10 @@ router.get("/doctors/count", authAdminMiddleware, getDoctorCount);
 router.get("/doctor/:publicId", authAdminMiddleware, getDoctorByPublicId);
 router.get("/doctors", authAdminMiddleware, getAllDoctors);
 router.put("/edit-doctor/:publicId", authAdminMiddleware, editDoctorByPublicId);
+router.delete(
+  "/delete-doctor/:publicId",
+  authAdminMiddleware,
+  deleteDoctorByPublicId
+);
 
 export default router;

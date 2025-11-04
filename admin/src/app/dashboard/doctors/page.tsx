@@ -61,8 +61,6 @@ export default function DoctorsPage() {
 
       setDoctors(res.data.data);
       setPagination(res.data.pagination);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("❌ Error fetching doctors:", err);
       const msg =
@@ -70,6 +68,22 @@ export default function DoctorsPage() {
         "Failed to load doctors. Please try again.";
       setError(msg);
       setDoctors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🗑️ Delete doctor
+  const handleDeleteDoctor = async (publicId: string) => {
+    try {
+      setLoading(true);
+      await api.delete(`/admin/delete-doctor/${publicId}`);
+
+      // ✅ Remove deleted doctor from UI without refetching full list
+      setDoctors((prev) => prev.filter((doc) => doc.publicId !== publicId));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("❌ Error deleting doctor:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +98,7 @@ export default function DoctorsPage() {
   // 🧠 Helpers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); // reset to first page
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   // 💄 Render
@@ -191,10 +205,13 @@ export default function DoctorsPage() {
                             <Pencil className="h-4 w-4 text-gray-700" />
                           </Button>
                         </Link>
+
                         <Button
                           variant="outline"
                           size="icon"
                           className="hover:bg-red-100"
+                          onClick={() => handleDeleteDoctor(doctor.publicId)}
+                          disabled={loading}
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
