@@ -308,7 +308,7 @@ export const getAllDoctors = async (req, res) => {
         },
         role: { select: { name: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { id: "asc" },
       skip: (page - 1) * limit,
       take: limit,
     });
