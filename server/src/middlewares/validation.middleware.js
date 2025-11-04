@@ -1,30 +1,47 @@
+import { ZodError } from "zod";
+
 /**
- * Generic Zod validation middleware
- * Formats errors as { field: message } for clean API responses
+ * ✅ Universal Zod validation middleware
+ * Safely validates body/query/params and formats errors cleanly.
+ * Works even if multiple Zod versions exist.
  */
 export const validationMiddleware = (schema) => (req, res, next) => {
   try {
-    req.body = schema.parse(req.body);
+    // Handle schema in { body, query, params } format or single schema
+    if (schema?.body) req.body = schema.body.parse(req.body);
+    else if (schema?.parse) req.body = schema.parse(req.body);
+
+    if (schema?.query) req.query = schema.query.parse(req.query);
+    if (schema?.params) req.params = schema.params.parse(req.params);
+
     next();
   } catch (err) {
-    // If it's a ZodError, format it nicely
-    if (err.errors && Array.isArray(err.errors)) {
+    const isZod =
+      err instanceof ZodError ||
+      (err?.name === "ZodError" && Array.isArray(err?.issues || err?.errors));
+
+    if (isZod) {
+      const issues = err.issues || err.errors || [];
       const formatted = {};
-      for (const e of err.errors) {
-        const field = e.path.join(".") || "unknown";
-        formatted[field] = e.message;
+
+      for (const issue of issues) {
+        const field = issue?.path?.join?.(".") || "unknown";
+        formatted[field] = issue?.message || "Invalid value";
       }
 
       return res.status(400).json({
+        success: false,
         message: "Validation failed",
         errors: formatted,
       });
     }
 
-    // Fallback (non-Zod errors)
-    return res.status(400).json({
-      message: "Validation failed",
-      errors: { general: err.message },
+    console.error("❌ Validation Middleware Internal Error:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal validation error.",
+      errors: { general: err?.message || "Unexpected error" },
     });
   }
 };

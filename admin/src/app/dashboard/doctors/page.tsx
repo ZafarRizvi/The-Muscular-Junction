@@ -61,6 +61,7 @@ export default function DoctorsPage() {
 
       setDoctors(res.data.data);
       setPagination(res.data.pagination);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("❌ Error fetching doctors:", err);
       const msg =

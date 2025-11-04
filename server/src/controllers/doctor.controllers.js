@@ -520,6 +520,11 @@ export const editDoctorByPublicId = async (req, res) => {
   }
 };
 
+/**
+ * @route   DELETE /api/admin/doctor/:publicId
+ * @desc    Soft delete doctor by publicId
+ * @access  Private
+ */
 export const deleteDoctorByPublicId = async (req, res) => {
   const { publicId } = req.params;
   console.log("🧾 Delete Doctor request for:", publicId);
